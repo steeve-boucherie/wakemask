@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wakemask"
+version = "0.0.1"
+description = "Wind farm production losses from turbine downtime, accounting for wake relief (PyWake-based)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Clément Jacquet", email = "do.no@email.me" }]
+keywords = ["wind energy", "wake", "availability", "O&M", "pywake"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    # Data science
+    "numpy==2.3.5",
+    "scipy>=1.11",
+    "pandas>=2.0",
+    "xarray>=2023.1",
+    # Pythonic way of life
+    "pydantic>=2.0",
+    # Wind farm simulation
+    "py_wake",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+    "pytest-cov",
+    "pre-commit",
+]
+doc = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+jupyter = [
+    "ipykernel",
+]
+
+[project.urls]
+Homepage = "https://github.com/steeve-boucherie/wakemask"
+Issues = "https://github.com/steeve-boucherie/wakemask/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wakemask"]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+extend-exclude = ["external"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "NPY", # numpy rules
+    "PD",  # pandas rules
+    "SIM", # simplify
+]
+ignore = [
+    "PD901", # allow `df` as a variable name
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
