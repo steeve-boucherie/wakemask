@@ -288,8 +288,8 @@ class MaskedArrayModel(abc.ABC):
 
         # Prepare inputs
         # TODO: Define behavior for time sim
-        _, _, stamps = self._as_conditions(ws, wd, sim_kw.get(PWDim.TIME))
-        op_state = as_op_state(sim_kw.get(PWTag.OP_STATE), len(x), stamps)
+        # _, _, stamps = self._as_conditions(ws, wd, sim_kw.get(PWDim.TIME))
+        op_state = as_op_state(sim_kw.get(PWTag.OP_STATE), len(x), None)
         sim_kw = {**sim_kw, PWTag.OP_STATE: op_state}  # NOTE: Don't mutate the original
 
         # Run the fit method
@@ -499,7 +499,7 @@ class BruteForceMask(MaskedArrayModel):
             **{PWTag.OP_STATE: op_state},
             **self._sim_kw
         )
-        return res[PWTag.POWER].sum(PWDim.WT)
+        return res[PWTag.POWER.value].sum(PWDim.WT)
 
 
 class StaticMask(MaskedArrayModel):
@@ -595,7 +595,7 @@ class StaticMask(MaskedArrayModel):
         """
         p = (
             self.base_res
-            [PWTag.POWER]
+            [PWTag.POWER.value]
             .sum(PWDim.WT)
             .sel({
                 PWDim.WS: ws,

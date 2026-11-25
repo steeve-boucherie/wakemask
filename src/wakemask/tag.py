@@ -30,6 +30,9 @@ class PWTag(StrEnum):
     X = 'x'
     Y = 'y'
 
+    # AEP
+    AEP = 'aep'
+
     # Operating state
     # NOTE: This may be moved to another class without notice
     OP_STATE = 'op_state'

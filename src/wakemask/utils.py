@@ -1,6 +1,9 @@
 """A bunch of utility method for masked array simulation."""
 import logging
 from copy import deepcopy
+from typing import get_args
+
+import pandas as pd
 
 from py_wake.wind_turbines import WindTurbine
 from py_wake.wind_turbines.power_ct_functions import (
@@ -9,7 +12,8 @@ from py_wake.wind_turbines.power_ct_functions import (
 )
 
 # PACKAGE IMPORTS
-from wakemask.tag import PWTag
+from wakemask.config import PwUnit
+from wakemask.tag import PWDim, PWTag
 
 
 # LOGGER
@@ -58,3 +62,48 @@ def with_op_state(wturb: WindTurbine) -> WindTurbine:
         ]
     )
     return wturb
+
+
+def to_pct(
+    df: pd.DataFrame,
+    pw_unit: PwUnit = 'kW',
+) -> PowerCtTabular:
+    """
+    Given a dataframe containing power- and CT-curves data, \
+    create the corresponding powerCtFunction object.
+
+    Parameters
+    ----------
+    df: DataFrame
+        Input dataframe.
+    pw_unit: 'W' | 'kW' | 'MW' |'GW'
+        Power curve unit.
+
+    Returns
+    -------
+        PowerCtTabular
+
+    Raises
+    ------
+        ValueError
+    """
+    # Check
+    allowed = get_args(PwUnit)
+    if pw_unit not in allowed:
+        raise ValueError(
+            f'Invalid power units: {pw_unit}. Allowed units are {allowed}.'
+            'Please check your inputs.'
+        )
+    if (missing := {PWDim.WS, PWTag.POWER, PWTag.CT}) - set(df.columns):
+        raise ValueError(
+            'The input power and ct curve dataframe is missing requested columns. '
+            f'Missing columns: {missing}. DataFrame columns: {df.columns}. '
+            'Please check your inputs.'
+        )
+    out = PowerCtTabular(
+        ws=df[PWDim.WS].to_numpy(),
+        power=df[PWTag.POWER].to_numpy(),
+        ct=df[PWTag.CT].to_numpy(),
+        power_unit='kW',  # TODO: Make some tests
+    )
+    return out
